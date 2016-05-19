@@ -7,74 +7,66 @@
 
 'use strict';
 
-var animation = require('../src/index.js');
+var jsonp = require('../src/index.js');
+var howdo = require('blear.utils.howdo');
 
 describe('测试文件', function () {
-    var divEl = null;
-
-    var getStyle = function (el, cssKey) {
-        return getComputedStyle(el).getPropertyValue(cssKey);
-    };
-
-    beforeAll(function (done) {
-        animation.defaults.duration = 100;
-        divEl = document.createElement('div');
-        divEl.style.position = 'absolute';
-        divEl.style.width = '100px';
-        divEl.style.height = '100px';
-        divEl.style.background = '#fcf';
-        document.body.appendChild(divEl);
-        done();
-    });
-
-    it('.animate@args4', function (done) {
-        console.log(divEl.style.width);
-        animation.animate(divEl, {
-            width: 200
-        }, {
-            duration: 10
-        }, function () {
-            console.log(divEl.style.width);
-            expect(getStyle(divEl, 'width')).toEqual('200px');
+    it('base', function (done) {
+        jsonp({
+            url: '/jsonp/success/',
+            callbackKey: 'callback',
+            callbackVal: 'fn',
+        }, function (err, data) {
+            expect(data).toEqual(2);
             done();
         });
     });
 
-    it('.animate@args3.1', function (done) {
-        console.log(divEl.style.width);
-        animation.animate(divEl, {
-            width: 300
-        }, function () {
-            console.log(divEl.style.width);
-            expect(getStyle(divEl, 'width')).toEqual('300px');
+    it('error', function (done) {
+        jsonp({
+            url: '/jsonp/error/',
+            callbackKey: 'callback',
+            callbackVal: 'fnError',
+        }, function (err, data) {
+            expect(err.type).toEqual('response');
             done();
         });
     });
 
-    it('.animate@args3.2', function (done) {
-        console.log(divEl.style.width);
-        animation.animate(divEl, {
-            width: 400
-        }, {
-            duration: 200
-        });
-        setTimeout(function () {
-            console.log(divEl.style.width);
-            expect(getStyle(divEl, 'width')).toEqual('400px');
+    it('callbackVal', function (done) {
+        jsonp({
+            url: '/jsonp/callbackVal/',
+            callbackKey: 'callback',
+        }, function (err, data) {
+            expect(data).toEqual(2);
             done();
-        }, 1000);
+        });
     });
 
-    it('.animate@args2', function (done) {
-        console.log(divEl.style.width);
-        animation.animate(divEl, {
-            width: 400
-        });
-
-        setTimeout(function () {
-            console.log(divEl.style.width);
-            expect(getStyle(divEl, 'width')).toEqual('400px');
-            done();
-        }, animation.defaults.duration * 2);
+    it('cache', function (done1) {
+        howdo
+            .task(function(done2){
+                jsonp({
+                    url: '/jsonp/cache/',
+                    callbackKey: 'callback',
+                    callbackVal: 'fnc1',
+                }, function (err, data) {
+                    done2(null,data);
+                });
+            })
+            .task(function(done2){
+                jsonp({
+                    url: '/jsonp/cache/',
+                    callbackKey: 'callback',
+                    callbackVal: 'fnc2',
+                    cache:false,
+                }, function (err, data) {
+                    done2(null,data);
+                });
+            })
+            .together(function(err,data1,data2){
+                expect(data1).not.toEqual(data2)
+                done1();
+            })
     });
 });
