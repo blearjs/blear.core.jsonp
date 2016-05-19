@@ -13,7 +13,30 @@ var path = require('path');
 
 // http 服务器
 var httpServer = function (req, res, next) {
-    next();
+    if (req.url.indexOf('/jsonp/success/') > -1) {
+        res.end('fn(2)');
+    }
+
+    else if (req.url.indexOf('/jsonp/error/') > -1) {
+        res.statusCode = 500;
+        res.end('fnError(2)');
+    }
+
+    else if (req.url.indexOf('/jsonp/callbackVal/') > -1) {
+        var query = req._parsedUrl.query;
+        var fn = query.split('=')[1];
+        res.end(fn + '(2)');
+    }
+    else if (req.url.indexOf('/jsonp/cache/') > -1) {
+        res.setHeader('Cache-Control', 'max-age=300000');
+        var query = req._parsedUrl.query.split('&');
+        var fn = query[0].split('=')[1];
+        var num = Math.random();
+
+        res.end(fn + '(' + num + ')');
+    } else {
+        next();
+    }
 };
 
 
