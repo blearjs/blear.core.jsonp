@@ -1,6 +1,6 @@
 {
   "name": "blear.core.jsonp",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "JSONP",
   "scripts": {
     "live": "browser-sync start --config bs-config.js",
@@ -35,14 +35,14 @@
   "bugs": {
     "url": "https://github.com/blearjs/blear.core.jsonp/issues"
   },
-  "dependencies": {},
-  "peerDependencies": {
+  "dependencies": {
     "blear.utils.url": "1.x",
     "blear.utils.object": "1.x",
     "blear.utils.loader": "1.x",
     "blear.utils.function": "1.x",
     "blear.utils.random": "1.x"
   },
+  "peerDependencies": {},
   "devDependencies": {
     "blear.polyfills.array": "^1.0.3",
     "blear.polyfills.date": "^1.0.1",
